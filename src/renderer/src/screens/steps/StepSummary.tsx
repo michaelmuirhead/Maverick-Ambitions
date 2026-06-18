@@ -1,4 +1,4 @@
-import type { Character } from '@shared/types/character'
+import type { Attributes, Character, Needs, Skills } from '@shared/types/character'
 import styles from './Steps.module.css'
 
 interface Props {
@@ -6,13 +6,30 @@ interface Props {
   onBegin: () => void
 }
 
-const STAT_LABELS: { key: keyof import('@shared/types/character').CoreStats; label: string; color: string }[] = [
+const ATTR_ROWS: { key: keyof Attributes; label: string; color: string }[] = [
   { key: 'intelligence', label: 'Intelligence', color: '#63b3ed' },
   { key: 'charisma',     label: 'Charisma',     color: '#f6ad55' },
-  { key: 'fitness',      label: 'Fitness',       color: '#68d391' },
   { key: 'streetSmarts', label: 'Street Smarts', color: '#fc8181' },
   { key: 'creativity',   label: 'Creativity',    color: '#b794f4' },
-  { key: 'happiness',    label: 'Happiness',     color: '#f0b429' }
+  { key: 'health',       label: 'Health',        color: '#68d391' }
+]
+
+const SKILL_LABELS: { key: keyof Skills; label: string }[] = [
+  { key: 'business',   label: 'Business'   },
+  { key: 'sales',      label: 'Sales'      },
+  { key: 'finance',    label: 'Finance'    },
+  { key: 'leadership', label: 'Leadership' },
+  { key: 'cooking',    label: 'Cooking'    },
+  { key: 'marketing',  label: 'Marketing'  },
+  { key: 'driving',    label: 'Driving'    }
+]
+
+const NEED_LABELS: { key: keyof Needs; label: string; icon: string }[] = [
+  { key: 'energy',  label: 'Energy',  icon: '⚡' },
+  { key: 'hunger',  label: 'Hunger',  icon: '🍽' },
+  { key: 'hygiene', label: 'Hygiene', icon: '🚿' },
+  { key: 'mood',    label: 'Mood',    icon: '😊' },
+  { key: 'social',  label: 'Social',  icon: '👥' }
 ]
 
 const EDUCATION_LABELS: Record<string, string> = {
@@ -23,6 +40,8 @@ const EDUCATION_LABELS: Record<string, string> = {
 }
 
 export default function StepSummary({ character, onBegin }: Props): JSX.Element {
+  const nonZeroSkills = SKILL_LABELS.filter(({ key }) => character.skills[key] > 0)
+
   return (
     <div className={styles.stepContent}>
       <div className={styles.summaryCard}>
@@ -66,23 +85,61 @@ export default function StepSummary({ character, onBegin }: Props): JSX.Element 
 
         <div className={styles.summaryDivider} />
 
-        {/* Stats */}
-        <div className={styles.statsList}>
-          {STAT_LABELS.map(({ key, label, color }) => {
-            const val = character.stats[key]
-            return (
-              <div key={key} className={styles.statRow}>
-                <span className={styles.statLabel}>{label}</span>
-                <div className={styles.statBarTrack}>
-                  <div
-                    className={styles.statBarFill}
-                    style={{ width: `${val}%`, background: color }}
-                  />
+        {/* Attributes */}
+        <div>
+          <h3 className={styles.summarySectionTitle} style={{ marginBottom: 10 }}>Attributes</h3>
+          <div className={styles.statsList}>
+            {ATTR_ROWS.map(({ key, label, color }) => {
+              const val = character.attributes[key]
+              return (
+                <div key={key} className={styles.statRow}>
+                  <span className={styles.statLabel}>{label}</span>
+                  <div className={styles.statBarTrack}>
+                    <div className={styles.statBarFill} style={{ width: `${val}%`, background: color }} />
+                  </div>
+                  <span className={styles.statValue}>{val}</span>
                 </div>
-                <span className={styles.statValue}>{val}</span>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Starting Skills */}
+        {nonZeroSkills.length > 0 && (
+          <>
+            <div className={styles.summaryDivider} />
+            <div>
+              <h3 className={styles.summarySectionTitle} style={{ marginBottom: 10 }}>Starting Skills</h3>
+              <div className={styles.skillGrid}>
+                {nonZeroSkills.map(({ key, label }) => {
+                  const val = character.skills[key]
+                  return (
+                    <div key={key} className={styles.skillChip}>
+                      <span className={styles.skillChipLabel}>{label}</span>
+                      <span className={styles.skillChipValue}>{val}</span>
+                      <div className={styles.skillChipBar} style={{ width: `${val}%` }} />
+                    </div>
+                  )
+                })}
               </div>
-            )
-          })}
+            </div>
+          </>
+        )}
+
+        {/* Needs note */}
+        <div className={styles.summaryDivider} />
+        <div className={styles.needsNote}>
+          <span className={styles.needsNoteTitle}>Daily Needs</span>
+          <div className={styles.needsPills}>
+            {NEED_LABELS.map(({ key, label, icon }) => (
+              <span key={key} className={styles.needsPill}>
+                {icon} {label} <strong>{character.needs[key]}</strong>
+              </span>
+            ))}
+          </div>
+          <p className={styles.needsNoteHint}>
+            Needs decay each day. Keep them up to perform at your best.
+          </p>
         </div>
       </div>
 

@@ -409,6 +409,92 @@
   text-align: right;
 }
 
+/* ── Skill chips (summary) ── */
+.skillGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.skillChip {
+  position: relative;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skillChipBar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--color-accent);
+  transition: width var(--transition-slow);
+}
+
+.skillChipLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  position: relative;
+}
+
+.skillChipValue {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-accent);
+  position: relative;
+}
+
+/* ── Needs note (summary) ── */
+.needsNote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.needsNoteTitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.needsPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.needsPill {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  padding: 2px 8px;
+}
+
+.needsPill strong {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.needsNoteHint {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* stat pill for skills on background cards */
+.statPillSkill {
+  color: var(--color-info);
+  border-color: rgba(99, 179, 237, 0.3);
+}
+
 /* Begin button */
 .beginBtn {
   width: 100%;
