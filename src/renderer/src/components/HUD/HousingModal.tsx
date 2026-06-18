@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useGameStore } from '../../store/gameStore'
 import { HOUSING } from '@shared/data/housing'
+import { marketRent, marketMoveInCost, marketDownPayment, marketMortgage } from '@shared/engine/economy'
 import type { HousingDef } from '@shared/types/housing'
 import styles from './HousingModal.module.css'
 
@@ -14,16 +15,14 @@ interface Props {
 export default function HousingModal({ open, onClose }: Props): JSX.Element | null {
   const character = useGameStore((s) => s.character)
   const housing   = useGameStore((s) => s.housing)
+  const economy   = useGameStore((s) => s.economy)
   const moveIn    = useGameStore((s) => s.moveIn)
   const [view, setView] = useState<ViewMode>('rent')
 
   if (!open || !character) return null
 
   const money = character.money
-
-  const listings = HOUSING.filter((h) =>
-    view === 'rent' ? h.canRent : h.canBuy
-  )
+  const listings = HOUSING.filter((h) => view === 'rent' ? h.canRent : h.canBuy)
 
   function handleMoveIn(def: HousingDef, owned: boolean): void {
     moveIn(def, owned)
@@ -34,13 +33,17 @@ export default function HousingModal({ open, onClose }: Props): JSX.Element | nu
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Housing</h2>
+          <h2 className={styles.title}>Housing Market</h2>
           {housing && (
             <span className={styles.currentLabel}>
               Currently: <strong>{housing.def.name}</strong>
               {housing.monthlyPayment > 0 && ` · $${housing.monthlyPayment.toLocaleString()}/mo`}
+              {housing.owned && ' (owned)'}
             </span>
           )}
+          <div className={styles.econNote}>
+            Housing index: <strong>{Math.round(economy.housingIndex * 100)}%</strong>
+          </div>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
@@ -61,10 +64,15 @@ export default function HousingModal({ open, onClose }: Props): JSX.Element | nu
 
         <div className={styles.listings}>
           {listings.map((def) => {
-            const isCurrent = housing?.def.id === def.id
-            const cost = view === 'rent' ? def.moveInCost : def.downPayment
-            const canAfford = money >= cost
-            const monthlyAmount = view === 'rent' ? def.monthlyRent : def.monthlyMortgage
+            const isCurrent = housing?.def.id === def.id && housing.owned === (view === 'buy')
+
+            const monthlyAmount = view === 'rent'
+              ? marketRent(def, economy)
+              : marketMortgage(def, economy)
+            const upfrontCost = view === 'rent'
+              ? marketMoveInCost(def, economy)
+              : marketDownPayment(def, economy)
+            const canAfford = money >= upfrontCost
 
             return (
               <div
@@ -83,9 +91,9 @@ export default function HousingModal({ open, onClose }: Props): JSX.Element | nu
                     {monthlyAmount > 0 && (
                       <span className={styles.cardMonthly}>${monthlyAmount.toLocaleString()}/mo</span>
                     )}
-                    {cost > 0 && (
+                    {upfrontCost > 0 && (
                       <span className={`${styles.cardCost} ${!canAfford ? styles.cardCostLocked : ''}`}>
-                        {view === 'rent' ? 'Move-in' : 'Down payment'}: ${cost.toLocaleString()}
+                        {view === 'rent' ? 'Move-in' : 'Down payment'}: ${upfrontCost.toLocaleString()}
                       </span>
                     )}
                   </div>
@@ -99,8 +107,11 @@ export default function HousingModal({ open, onClose }: Props): JSX.Element | nu
                   <StatPill
                     label="Mood/hr"
                     value={def.moodPerHour >= 0 ? `+${def.moodPerHour}` : `${def.moodPerHour}`}
-                    positive={def.moodPerHour >= 0}
+                    negative={def.moodPerHour < 0}
                   />
+                  {view === 'rent' && (
+                    <StatPill label="Rate" value={`${Math.round(economy.housingIndex * 100)}%`} dimmed />
+                  )}
                 </div>
 
                 <div className={styles.cardFooter}>
@@ -115,7 +126,7 @@ export default function HousingModal({ open, onClose }: Props): JSX.Element | nu
                     </button>
                   ) : (
                     <span className={styles.lockedLabel}>
-                      Need ${(cost - money).toLocaleString()} more
+                      Need ${(upfrontCost - money).toLocaleString()} more
                     </span>
                   )}
                 </div>
@@ -129,16 +140,15 @@ export default function HousingModal({ open, onClose }: Props): JSX.Element | nu
 }
 
 function StatPill({
-  label,
-  value,
-  positive
+  label, value, negative, dimmed
 }: {
   label: string
   value: string
-  positive?: boolean
+  negative?: boolean
+  dimmed?: boolean
 }): JSX.Element {
   return (
-    <span className={`${styles.statPill} ${positive === false ? styles.statPillNeg : ''}`}>
+    <span className={`${styles.statPill} ${negative ? styles.statPillNeg : ''} ${dimmed ? styles.statPillDimmed : ''}`}>
       <span className={styles.statPillLabel}>{label}</span>
       <span className={styles.statPillValue}>{value}</span>
     </span>

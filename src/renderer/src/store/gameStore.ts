@@ -6,11 +6,16 @@ import type {
 } from '@shared/types/game'
 import type { Employment, JobOffer } from '@shared/types/jobs'
 import type { Housing, HousingDef } from '@shared/types/housing'
+import type { EconomyState } from '@shared/types/economy'
 import { GAME_START, advanceHour } from '@shared/engine/gameTime'
 import { makeActivity } from '@shared/engine/activities'
 import { applyTick } from '@shared/engine/tick'
 import { resolveJobSearch, OFFER_EXPIRY_HOURS } from '@shared/engine/jobSearch'
 import { HOUSING_MAP, BACKGROUND_STARTING_HOUSING, makeHousing } from '@shared/data/housing'
+import {
+  initEconomy, advanceEconomy,
+  marketRent, marketMoveInCost, marketDownPayment, marketMortgage
+} from '@shared/engine/economy'
 
 interface GameStore {
   character: Character | null
@@ -22,6 +27,7 @@ interface GameStore {
   jobOffers: JobOffer[]
   employment: Employment | null
   housing: Housing | null
+  economy: EconomyState
 
   startGame: (character: Character) => void
   tick: () => void
@@ -45,6 +51,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   jobOffers: [],
   employment: null,
   housing: null,
+  economy: initEconomy(),
 
   startGame: (character) => {
     const startingHousingId = BACKGROUND_STARTING_HOUSING[character.background.id]
@@ -60,6 +67,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       jobOffers: [],
       employment: null,
       housing,
+      economy: initEconomy(),
       eventLog: [
         {
           id: crypto.randomUUID(),
@@ -99,31 +107,57 @@ export const useGameStore = create<GameStore>((set, get) => ({
       year: newTime.year, hour: newTime.hour
     }
 
-    // Monthly rent/mortgage deduction on the 1st at midnight
     let finalMoney = updatedChar.money
-    if (newTime.day === 1 && newTime.hour === 0 && housing && housing.monthlyPayment > 0) {
-      finalMoney = Math.max(0, finalMoney - housing.monthlyPayment)
-      const paymentLabel = housing.owned ? 'Mortgage' : 'Rent'
-      newEvents.push({
-        id: crypto.randomUUID(),
-        message: `${paymentLabel} paid: $${housing.monthlyPayment.toLocaleString()} — ${housing.def.name}.`,
-        kind: 'info',
-        gameTime: timeCtx
-      })
-      if (updatedChar.money < housing.monthlyPayment) {
+    let currentEconomy = state.economy
+    let currentHousing = housing
+
+    // ── Monthly processing: economy advance + rent ─────────────────────────────
+    if (newTime.day === 1 && newTime.hour === 0) {
+      // 1. Advance the economy
+      const { economy: newEconomy, events: econEvents } = advanceEconomy(currentEconomy, newTime)
+      newEvents.push(...econEvents)
+      currentEconomy = newEconomy
+
+      // 2. For renters: recalculate rent to reflect current market
+      if (currentHousing && !currentHousing.owned && currentHousing.monthlyPayment > 0) {
+        const newRent = marketRent(currentHousing.def, newEconomy)
+        if (newRent !== currentHousing.monthlyPayment) {
+          const dir = newRent > currentHousing.monthlyPayment ? 'up' : 'down'
+          newEvents.push({
+            id: crypto.randomUUID(),
+            message: `Rent adjusted ${dir} to $${newRent.toLocaleString()}/mo — ${currentHousing.def.name}.`,
+            kind: dir === 'up' ? 'warning' : 'info',
+            gameTime: timeCtx
+          })
+        }
+        currentHousing = { ...currentHousing, monthlyPayment: newRent }
+      }
+
+      // 3. Deduct rent or mortgage
+      if (currentHousing && currentHousing.monthlyPayment > 0) {
+        const paymentLabel = currentHousing.owned ? 'Mortgage' : 'Rent'
+        finalMoney = Math.max(0, finalMoney - currentHousing.monthlyPayment)
         newEvents.push({
           id: crypto.randomUUID(),
-          message: `⚠ You couldn't fully cover your ${paymentLabel.toLowerCase()}! Get more income.`,
-          kind: 'danger',
+          message: `${paymentLabel} paid: $${currentHousing.monthlyPayment.toLocaleString()} — ${currentHousing.def.name}.`,
+          kind: 'info',
           gameTime: timeCtx
         })
+        if (updatedChar.money < currentHousing.monthlyPayment) {
+          newEvents.push({
+            id: crypto.randomUUID(),
+            message: `⚠ You couldn't fully cover your ${paymentLabel.toLowerCase()}! Get more income.`,
+            kind: 'danger',
+            gameTime: timeCtx
+          })
+        }
       }
     }
 
-    // Resolve completed job-search
+    // ── Resolve completed job-search ───────────────────────────────────────────
     if (activityDone && activeActivity?.type === 'job-search') {
       const existingIds = state.jobOffers.map((o) => o.job.id)
-      const newOffers = resolveJobSearch(updatedChar, activeActivity.totalHours, existingIds, newTime)
+      const newOffers = resolveJobSearch(updatedChar, activeActivity.totalHours, existingIds, newTime, currentEconomy)
       if (newOffers.length > 0) {
         newEvents.push({
           id: crypto.randomUUID(),
@@ -142,12 +176,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // Expire old job offers
+    // ── Expire old job offers ──────────────────────────────────────────────────
     const validOffers = state.jobOffers.filter(
       (o) => newTime.totalHours - o.offeredAtHour < OFFER_EXPIRY_HOURS
     )
 
-    // Advance activity
+    // ── Advance activity ───────────────────────────────────────────────────────
     let nextActivity: ScheduledActivity | null = activeActivity
     let nextQueue = get().activityQueue
 
@@ -181,6 +215,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activityQueue: nextQueue,
       jobOffers: validOffers,
       employment: updatedEmployment,
+      housing: currentHousing,
+      economy: currentEconomy,
       eventLog: newEvents.length > 0
         ? [...newEvents, ...s.eventLog].slice(0, 100)
         : s.eventLog,
@@ -262,13 +298,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   moveIn: (def, owned) => {
-    const { character, gameTime } = get()
+    const { character, gameTime, economy } = get()
     if (!character) return
 
-    const cost = owned ? def.downPayment : def.moveInCost
-    if (character.money < cost) return  // shouldn't be callable, but guard anyway
+    // Use live market prices at time of move
+    const cost = owned ? marketDownPayment(def, economy) : marketMoveInCost(def, economy)
+    if (character.money < cost) return
 
-    const newHousing = makeHousing(def, owned, gameTime.totalHours)
+    // Owners lock in today's mortgage rate; renters will drift with the market
+    const monthlyPayment = owned ? marketMortgage(def, economy) : marketRent(def, economy)
+    const newHousing: Housing = { def, owned, moveInHour: gameTime.totalHours, monthlyPayment }
     const monthlyLabel = owned ? 'mortgage' : 'rent'
 
     set((s) => ({
@@ -276,7 +315,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       character: { ...character, money: character.money - cost },
       eventLog: [{
         id: crypto.randomUUID(),
-        message: `Moved into ${def.name}. ${owned ? `Down payment` : `Move-in cost`}: $${cost.toLocaleString()}. Monthly ${monthlyLabel}: $${newHousing.monthlyPayment.toLocaleString()}.`,
+        message: `Moved into ${def.name}. ${owned ? 'Down payment' : 'Move-in cost'}: $${cost.toLocaleString()}. Monthly ${monthlyLabel}: $${monthlyPayment.toLocaleString()}.`,
         kind: 'success',
         gameTime: { day: gameTime.day, month: gameTime.month, year: gameTime.year, hour: gameTime.hour }
       }, ...s.eventLog]

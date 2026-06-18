@@ -1,7 +1,9 @@
 import type { Character } from '../types/character'
-import type { JobOffer } from '../types/jobs'
+import type { JobDef, JobOffer } from '../types/jobs'
 import type { GameTime } from '../types/game'
+import type { EconomyState } from '../types/economy'
 import { JOBS } from '../data/jobs'
+import { marketWage } from './economy'
 
 /** Chance per search-hour of finding an offer (base 25%, boosted by CHA + STR) */
 function offerChance(character: Character): number {
@@ -12,7 +14,7 @@ function offerChance(character: Character): number {
 }
 
 /** Returns true if the character meets the skill requirements for a job */
-function meetsRequirements(character: Character, job: import('../types/jobs').JobDef): boolean {
+function meetsRequirements(character: Character, job: JobDef): boolean {
   for (const [skill, required] of Object.entries(job.requiredSkills)) {
     const playerSkill = character.skills[skill as keyof typeof character.skills]
     if (playerSkill < (required ?? 0)) return false
@@ -22,13 +24,15 @@ function meetsRequirements(character: Character, job: import('../types/jobs').Jo
 
 /**
  * Called after a completed job-search activity.
+ * Offer wages reflect current labour market conditions via the economy.
  * Returns an array of new job offers (may be empty).
  */
 export function resolveJobSearch(
   character: Character,
   hoursSearched: number,
   existingOfferJobIds: string[],
-  gameTime: GameTime
+  gameTime: GameTime,
+  economy: EconomyState
 ): JobOffer[] {
   const eligible = JOBS.filter(
     (j) =>
@@ -43,13 +47,16 @@ export function resolveJobSearch(
 
   for (let i = 0; i < hoursSearched; i++) {
     if (Math.random() < chance) {
-      // Pick a random eligible job not already offered this search
       const remaining = eligible.filter((j) => !offers.some((o) => o.job.id === j.id))
       if (remaining.length === 0) break
-      const job = remaining[Math.floor(Math.random() * remaining.length)]
+      const baseDef = remaining[Math.floor(Math.random() * remaining.length)]
+
+      // Scale the offered wage to reflect current market conditions
+      const marketDef: JobDef = { ...baseDef, hourlyWage: marketWage(baseDef.hourlyWage, economy) }
+
       offers.push({
         id: crypto.randomUUID(),
-        job,
+        job: marketDef,
         offeredAtHour: gameTime.totalHours
       })
     }
@@ -58,4 +65,4 @@ export function resolveJobSearch(
   return offers
 }
 
-export const OFFER_EXPIRY_HOURS = 168  // 7 days
+export const OFFER_EXPIRY_HOURS = 168  // 7 game days

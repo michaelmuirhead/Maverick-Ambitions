@@ -46,6 +46,17 @@
   color: var(--color-text-secondary);
 }
 
+.econNote {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.econNote strong {
+  color: var(--color-accent);
+}
+
 .closeBtn {
   width: 28px;
   height: 28px;
@@ -215,6 +226,10 @@
 
 .statPillNeg {
   border-color: var(--color-danger);
+}
+
+.statPillDimmed {
+  opacity: 0.6;
 }
 
 .statPillLabel {

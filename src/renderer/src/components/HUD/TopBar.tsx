@@ -1,6 +1,7 @@
 import { useGameStore } from '../../store/gameStore'
 import { formatDate, formatTime } from '@shared/engine/gameTime'
 import type { ClockSpeed } from '@shared/types/game'
+import type { EconomicPhase } from '@shared/types/economy'
 import styles from './TopBar.module.css'
 
 const SPEEDS: { value: ClockSpeed; label: string }[] = [
@@ -9,12 +10,27 @@ const SPEEDS: { value: ClockSpeed; label: string }[] = [
   { value: 4, label: '4×' }
 ]
 
+const PHASE_ICONS: Record<EconomicPhase, string> = {
+  expansion:   '📈',
+  peak:        '📊',
+  contraction: '📉',
+  trough:      '🔻'
+}
+
+const PHASE_LABELS: Record<EconomicPhase, string> = {
+  expansion:   'Expansion',
+  peak:        'Peak',
+  contraction: 'Recession',
+  trough:      'Trough'
+}
+
 export default function TopBar({ onOpenHousing }: { onOpenHousing: () => void }): JSX.Element {
-  const character = useGameStore((s) => s.character)
-  const gameTime = useGameStore((s) => s.gameTime)
-  const clock = useGameStore((s) => s.clock)
+  const character  = useGameStore((s) => s.character)
+  const gameTime   = useGameStore((s) => s.gameTime)
+  const clock      = useGameStore((s) => s.clock)
+  const economy    = useGameStore((s) => s.economy)
   const togglePause = useGameStore((s) => s.togglePause)
-  const setSpeed = useGameStore((s) => s.setSpeed)
+  const setSpeed   = useGameStore((s) => s.setSpeed)
 
   if (!character) return <></>
 
@@ -34,6 +50,14 @@ export default function TopBar({ onOpenHousing }: { onOpenHousing: () => void })
       <div className={styles.clock}>
         <span className={styles.date}>{formatDate(gameTime)}</span>
         <span className={styles.time}>{formatTime(gameTime)}</span>
+      </div>
+
+      <div className={styles.economy}>
+        <span className={styles.econIcon}>{PHASE_ICONS[economy.phase]}</span>
+        <div className={styles.econText}>
+          <span className={styles.econPhase}>{PHASE_LABELS[economy.phase]}</span>
+          <span className={styles.econRate}>{(economy.annualInflation * 100).toFixed(1)}% infl.</span>
+        </div>
       </div>
 
       <div className={styles.controls}>
