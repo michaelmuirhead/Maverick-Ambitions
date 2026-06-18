@@ -17,7 +17,9 @@ export default function StepBackground({ draft, onChange }: Props): JSX.Element 
       <div className={styles.cardGrid}>
         {BACKGROUNDS.map((bg) => {
           const isSelected = draft.backgroundId === bg.id
-          const bonuses = Object.entries(bg.statBonuses).filter(([, v]) => v !== 0)
+          const attrBonuses = Object.entries(bg.attributeBonuses).filter(([, v]) => (v ?? 0) !== 0)
+          const skillBonuses = Object.entries(bg.skillBonuses).filter(([, v]) => (v ?? 0) !== 0)
+
           return (
             <button
               key={bg.id}
@@ -36,12 +38,17 @@ export default function StepBackground({ draft, onChange }: Props): JSX.Element 
               <p className={styles.bgCardFlavour}>{bg.flavour}</p>
 
               <div className={styles.bgCardStats}>
-                {bonuses.map(([stat, val]) => (
+                {attrBonuses.map(([stat, val]) => (
                   <span
                     key={stat}
                     className={`${styles.statPill} ${(val ?? 0) > 0 ? styles.statPillPos : styles.statPillNeg}`}
                   >
-                    {(val ?? 0) > 0 ? '+' : ''}{val} {formatStat(stat)}
+                    {(val ?? 0) > 0 ? '+' : ''}{val} {formatAttr(stat)}
+                  </span>
+                ))}
+                {skillBonuses.map(([skill, val]) => (
+                  <span key={skill} className={`${styles.statPill} ${styles.statPillSkill}`}>
+                    +{val} {formatSkill(skill)}
                   </span>
                 ))}
                 <span className={styles.statPill}>{formatEducation(bg.startingEducation)}</span>
@@ -54,14 +61,26 @@ export default function StepBackground({ draft, onChange }: Props): JSX.Element 
   )
 }
 
-function formatStat(key: string): string {
+function formatAttr(key: string): string {
   const map: Record<string, string> = {
     intelligence: 'INT',
     charisma: 'CHA',
-    fitness: 'FIT',
     streetSmarts: 'STR',
     creativity: 'CRE',
-    happiness: 'HAP'
+    health: 'HLT'
+  }
+  return map[key] ?? key
+}
+
+function formatSkill(key: string): string {
+  const map: Record<string, string> = {
+    business: 'Business',
+    sales: 'Sales',
+    finance: 'Finance',
+    leadership: 'Leadership',
+    cooking: 'Cooking',
+    marketing: 'Marketing',
+    driving: 'Driving'
   }
   return map[key] ?? key
 }

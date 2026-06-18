@@ -8,7 +8,8 @@ export const BACKGROUNDS: Background[] = [
     flavour: '"The streets were my classroom."',
     startingMoney: 500,
     startingEducation: 'high-school',
-    statBonuses: { streetSmarts: 25, charisma: 10, fitness: 5, intelligence: -5 }
+    attributeBonuses: { streetSmarts: 25, charisma: 10, health: 5, intelligence: -5 },
+    skillBonuses: { sales: 15, marketing: 10, driving: 5 }
   },
   {
     id: 'middle-ground',
@@ -17,7 +18,8 @@ export const BACKGROUNDS: Background[] = [
     flavour: '"Average start. Unlimited potential."',
     startingMoney: 2500,
     startingEducation: 'high-school',
-    statBonuses: { intelligence: 5, charisma: 5, fitness: 5, streetSmarts: 5 }
+    attributeBonuses: { intelligence: 5, charisma: 5, streetSmarts: 5 },
+    skillBonuses: { business: 5, sales: 5 }
   },
   {
     id: 'heir',
@@ -26,7 +28,8 @@ export const BACKGROUNDS: Background[] = [
     flavour: '"I didn\'t ask to be born into this. But here we are."',
     startingMoney: 30000,
     startingEducation: 'degree',
-    statBonuses: { intelligence: 15, charisma: 15, fitness: 0, streetSmarts: -20 }
+    attributeBonuses: { intelligence: 15, charisma: 15, streetSmarts: -20 },
+    skillBonuses: { leadership: 15, business: 10, finance: 10 }
   },
   {
     id: 'scholar',
@@ -35,7 +38,8 @@ export const BACKGROUNDS: Background[] = [
     flavour: '"I can out-think any problem."',
     startingMoney: 1200,
     startingEducation: 'degree',
-    statBonuses: { intelligence: 25, creativity: 10, charisma: 5, streetSmarts: -10 }
+    attributeBonuses: { intelligence: 25, creativity: 10, charisma: 5, streetSmarts: -10 },
+    skillBonuses: { finance: 15, business: 10, marketing: 5 }
   },
   {
     id: 'immigrant-dream',
@@ -44,7 +48,8 @@ export const BACKGROUNDS: Background[] = [
     flavour: '"I crossed an ocean for this opportunity."',
     startingMoney: 350,
     startingEducation: 'high-school',
-    statBonuses: { streetSmarts: 20, charisma: 20, fitness: 10, intelligence: 5, happiness: -10 }
+    attributeBonuses: { streetSmarts: 20, charisma: 20, health: 10, intelligence: 5 },
+    skillBonuses: { sales: 10, cooking: 15, driving: 10 }
   }
 ]
 
