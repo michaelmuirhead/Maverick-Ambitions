@@ -82,6 +82,16 @@ export const ACTIVITIES: ActivityDef[] = [
     fixedHours: null,
     durationOptions: [1, 2, 3, 4],
     needsDelta: { energy: -4, mood: -3, hunger: -3, social: -1 }
+  },
+  {
+    type: 'work-shift',
+    label: 'Work Shift',
+    description: 'Put in a shift at your job. Earn your wage and build skills.',
+    icon: '💼',
+    fixedHours: null,
+    durationOptions: [4, 8],
+    needsDelta: { energy: -6, hunger: -4, hygiene: -3, mood: -2, social: -2 }
+    // incomePerHour comes from the job via ScheduledActivity.incomeOverride
   }
 ]
 

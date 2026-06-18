@@ -1,5 +1,6 @@
 import type { Character, Needs } from '../types/character'
 import type { GameEvent, GameTime, ScheduledActivity } from '../types/game'
+import type { Employment } from '../types/jobs'
 import { ACTIVITY_MAP } from './activities'
 
 const BASE_DECAY: Needs = {
@@ -8,6 +9,13 @@ const BASE_DECAY: Needs = {
   hygiene: -2,
   mood: -1,
   social: -2
+}
+
+// Needs performance multiplier — poor needs reduce work effectiveness
+function performanceMultiplier(needs: Needs): number {
+  const energyFactor = needs.energy / 100
+  const moodFactor   = needs.mood   / 100
+  return Math.max(0.5, (energyFactor * 0.6 + moodFactor * 0.4))
 }
 
 interface TickResult {
@@ -19,7 +27,8 @@ interface TickResult {
 export function applyTick(
   character: Character,
   activity: ScheduledActivity | null,
-  gameTime: GameTime
+  gameTime: GameTime,
+  employment: Employment | null
 ): TickResult {
   const events: GameEvent[] = []
   let needs = { ...character.needs }
@@ -28,24 +37,35 @@ export function applyTick(
 
   const activityDef = activity ? ACTIVITY_MAP[activity.type] : null
 
-  // Apply base decay every hour regardless of activity
+  // Base decay every hour regardless of activity
   needs = applyNeedsDelta(needs, BASE_DECAY)
 
   if (activityDef) {
-    // Activity overrides/supplements the base delta
+    // Activity replaces base decay for the needs it explicitly controls
     needs = applyNeedsDelta(needs, activityDef.needsDelta)
-    // Undo the base decay for stats the activity explicitly manages
     for (const key of Object.keys(activityDef.needsDelta) as (keyof Needs)[]) {
       needs[key] = clampNeed(needs[key] - BASE_DECAY[key])
     }
   }
 
-  // Apply income/cost from activity
-  if (activityDef?.incomePerHour) {
-    money = Math.max(0, money + activityDef.incomePerHour)
+  // Income: use incomeOverride (work-shift) or activity def's incomePerHour
+  const income = activity?.incomeOverride ?? activityDef?.incomePerHour ?? 0
+  if (income !== 0) {
+    if (activity?.type === 'work-shift') {
+      const perf = performanceMultiplier(character.needs)
+      money = Math.max(0, money + income * perf)
+    } else {
+      money = Math.max(0, money + income)
+    }
   }
 
-  // Apply skill XP
+  // Tip income for café/delivery (charisma-based bonus stored on job)
+  if (activity?.type === 'work-shift' && employment) {
+    const tip = (employment.job.charismaBonus ?? 0) * character.attributes.charisma
+    money += tip
+  }
+
+  // Skill XP from activity defs (socialise → sales, etc.)
   if (activityDef?.skillXp) {
     for (const [k, xp] of Object.entries(activityDef.skillXp)) {
       const key = k as keyof typeof skills
@@ -53,8 +73,24 @@ export function applyTick(
     }
   }
 
-  // Low-need warnings (only fire at thresholds to avoid spam)
-  const timeCtx = { day: gameTime.day, month: gameTime.month, year: gameTime.year, hour: gameTime.hour }
+  // Skill XP from work
+  if (activity?.type === 'work-shift' && employment) {
+    const { primarySkill, secondarySkill } = employment.job
+    if (primarySkill) {
+      skills[primarySkill] = Math.min(100, skills[primarySkill] + 0.5)
+    }
+    if (secondarySkill) {
+      skills[secondarySkill] = Math.min(100, skills[secondarySkill] + 0.25)
+    }
+  }
+
+  // Low-need warnings (fire once at 40 and 20 thresholds)
+  const timeCtx = {
+    day: gameTime.day,
+    month: gameTime.month,
+    year: gameTime.year,
+    hour: gameTime.hour
+  }
   for (const [key, val] of Object.entries(needs) as [keyof Needs, number][]) {
     if (val <= 20 && Math.floor(character.needs[key]) > 20) {
       events.push({
@@ -73,7 +109,7 @@ export function applyTick(
     }
   }
 
-  // Mood is penalised when multiple needs are critically low
+  // Mood penalty when multiple needs are critical
   const criticalCount = Object.values(needs).filter((v) => v < 20).length
   if (criticalCount >= 3) {
     needs.mood = clampNeed(needs.mood - 5)

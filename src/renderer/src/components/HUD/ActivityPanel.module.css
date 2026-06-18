@@ -2,9 +2,71 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
+  overflow: hidden;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  transition: all var(--transition-fast);
+}
+
+.tab:hover { color: var(--color-text-primary); }
+
+.tabActive {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.badge {
+  background: var(--color-accent);
+  color: var(--color-bg-deep);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 8px;
+}
+
+/* Tab content area — scrollable */
+.current,
+.queueSection,
+.pickerSection,
+.careerTab {
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.careerTab {
+  flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Schedule tab inner scroll */
+.panel > .current,
+.panel > .queueSection,
+.panel > .pickerSection {
+  flex-shrink: 0;
 }
 
 .sectionTitle {
@@ -220,4 +282,173 @@
 
 .cancelBtn:hover {
   color: var(--color-text-secondary);
+}
+
+/* ── Career tab ── */
+.careerSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.activeWage {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-success);
+}
+
+.jobCard,
+.offerCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.jobCard {
+  border-left: 3px solid var(--color-success);
+}
+
+.offerCard {
+  border-left: 3px solid var(--color-accent);
+}
+
+.jobCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.jobTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.jobWage {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-success);
+}
+
+.jobEmployer {
+  font-size: 11px;
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.jobDesc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.jobStats {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.offerList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.offerActions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.acceptBtn {
+  flex: 1;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid var(--color-success);
+  color: var(--color-success);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.acceptBtn:hover {
+  background: rgba(72, 187, 120, 0.2);
+}
+
+.declineBtn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.declineBtn:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.quitBtn {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  align-self: flex-start;
+  transition: all var(--transition-fast);
+}
+
+.quitBtn:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.quitConfirm {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.quitYes {
+  padding: 2px 10px;
+  background: rgba(252, 129, 129, 0.1);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  font-size: 11px;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.quitNo {
+  padding: 2px 10px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.noJob {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-style: italic;
 }

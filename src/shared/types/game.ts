@@ -22,11 +22,14 @@ export type ActivityType =
   | 'socialise'
   | 'leisure'
   | 'job-search'
+  | 'work-shift'
 
 export interface ScheduledActivity {
   type: ActivityType
   hoursRemaining: number
   totalHours: number
+  /** Overrides the activity def's incomePerHour (used for work-shift) */
+  incomeOverride?: number
 }
 
 export type GameEventKind = 'info' | 'warning' | 'success' | 'danger'
