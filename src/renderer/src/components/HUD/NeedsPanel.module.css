@@ -1,0 +1,111 @@
+.panel {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--color-bg-dark);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+/* ── Need rows ── */
+.needRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.needIcon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.needBarWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.needLabel {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+.needTrack {
+  height: 5px;
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.needFill {
+  height: 100%;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.needVal {
+  font-size: 11px;
+  font-weight: 700;
+  width: 24px;
+  text-align: right;
+  transition: color 0.3s ease;
+}
+
+/* ── Attribute rows ── */
+.attrRow {
+  display: grid;
+  grid-template-columns: 28px 1fr 24px;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.attrLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+}
+
+.attrTrack {
+  height: 4px;
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.attrFill {
+  height: 100%;
+  background: var(--color-border-light);
+  transition: width 0.5s ease;
+}
+
+.attrVal {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+}

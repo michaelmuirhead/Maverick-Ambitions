@@ -1,0 +1,223 @@
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ── Current activity ── */
+.current {
+  flex-shrink: 0;
+}
+
+.activeCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
+}
+
+.activeIcon {
+  font-size: 28px;
+}
+
+.activeInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.activeName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.activeProgress {
+  height: 4px;
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.activeProgressFill {
+  height: 100%;
+  background: var(--color-accent);
+  transition: width 0.4s ease;
+}
+
+.activeHours {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.idleCard {
+  padding: var(--spacing-md);
+  background: var(--color-bg-card);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.idleCardPaused {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-glow);
+}
+
+/* ── Queue ── */
+.queueSection {
+  flex-shrink: 0;
+}
+
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.queueItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.queueHours {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* ── Picker ── */
+.pickerSection {
+  flex: 1;
+}
+
+.activityGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.activityBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md) var(--spacing-sm);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.activityBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+  background: var(--color-accent-glow);
+}
+
+.activityBtnIcon {
+  font-size: 24px;
+}
+
+.activityBtnLabel {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── Duration picker ── */
+.durationPicker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+}
+
+.durationHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: 24px;
+}
+
+.durationTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.durationDesc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.durationPrompt {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.durationOptions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.durationBtn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.durationBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-glow);
+}
+
+.cancelBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  padding: 0;
+  text-align: left;
+  transition: color var(--transition-fast);
+}
+
+.cancelBtn:hover {
+  color: var(--color-text-secondary);
+}
