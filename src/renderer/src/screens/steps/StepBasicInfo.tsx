@@ -8,13 +8,12 @@ interface Props {
 
 const GENDERS: { value: Gender; label: string; icon: string }[] = [
   { value: 'male', label: 'Male', icon: '♂' },
-  { value: 'female', label: 'Female', icon: '♀' },
-  { value: 'nonbinary', label: 'Non-binary', icon: '⚬' }
+  { value: 'female', label: 'Female', icon: '♀' }
 ]
 
-const CURRENT_YEAR = 2000
-const MIN_BIRTH_YEAR = CURRENT_YEAR - 30   // max age 30
-const MAX_BIRTH_YEAR = CURRENT_YEAR - 18   // min age 18
+const GAME_START_YEAR = 2000
+const MIN_AGE = 18
+const MAX_AGE = 40
 
 export default function StepBasicInfo({ draft, onChange }: Props): JSX.Element {
   return (
@@ -68,24 +67,24 @@ export default function StepBasicInfo({ draft, onChange }: Props): JSX.Element {
 
       <div className={styles.field}>
         <label className={styles.label}>
-          Birth Year
+          Starting Age
           <span className={styles.labelHint}>
-            — You begin your story at age {CURRENT_YEAR - draft.birthYear}
+            — Born {draft.birthYear}
           </span>
         </label>
         <div className={styles.sliderWrapper}>
           <input
             className={styles.slider}
             type="range"
-            min={MIN_BIRTH_YEAR}
-            max={MAX_BIRTH_YEAR}
-            value={draft.birthYear}
-            onChange={(e) => onChange({ birthYear: Number(e.target.value) })}
+            min={MIN_AGE}
+            max={MAX_AGE}
+            value={GAME_START_YEAR - draft.birthYear}
+            onChange={(e) => onChange({ birthYear: GAME_START_YEAR - Number(e.target.value) })}
           />
           <div className={styles.sliderLabels}>
-            <span>Age 30</span>
-            <span className={styles.sliderValue}>{draft.birthYear}</span>
-            <span>Age 18</span>
+            <span>Age {MIN_AGE}</span>
+            <span className={styles.sliderValue}>Age {GAME_START_YEAR - draft.birthYear}</span>
+            <span>Age {MAX_AGE}</span>
           </div>
         </div>
       </div>

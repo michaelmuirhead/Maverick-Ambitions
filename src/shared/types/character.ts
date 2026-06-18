@@ -1,4 +1,4 @@
-export type Gender = 'male' | 'female' | 'nonbinary'
+export type Gender = 'male' | 'female'
 
 export type BackgroundId =
   | 'hustler'
