@@ -1,21 +1,18 @@
 import { create } from 'zustand'
 import type { Character } from '@shared/types/character'
 import type {
-  ActivityType,
-  ClockSpeed,
-  ClockState,
-  GameEvent,
-  GameTime,
-  ScheduledActivity
+  ActivityType, ClockSpeed, ClockState,
+  GameEvent, GameTime, ScheduledActivity
 } from '@shared/types/game'
 import type { Employment, JobOffer } from '@shared/types/jobs'
+import type { Housing, HousingDef } from '@shared/types/housing'
 import { GAME_START, advanceHour } from '@shared/engine/gameTime'
 import { makeActivity } from '@shared/engine/activities'
 import { applyTick } from '@shared/engine/tick'
 import { resolveJobSearch, OFFER_EXPIRY_HOURS } from '@shared/engine/jobSearch'
+import { HOUSING_MAP, BACKGROUND_STARTING_HOUSING, makeHousing } from '@shared/data/housing'
 
 interface GameStore {
-  // ── State ─────────────────────────────────────────────────────────────────
   character: Character | null
   gameTime: GameTime
   clock: ClockState
@@ -24,8 +21,8 @@ interface GameStore {
   eventLog: GameEvent[]
   jobOffers: JobOffer[]
   employment: Employment | null
+  housing: Housing | null
 
-  // ── Actions ───────────────────────────────────────────────────────────────
   startGame: (character: Character) => void
   tick: () => void
   togglePause: () => void
@@ -35,6 +32,7 @@ interface GameStore {
   acceptOffer: (offerId: string) => void
   declineOffer: (offerId: string) => void
   quitJob: () => void
+  moveIn: (def: HousingDef, owned: boolean) => void
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -46,8 +44,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   eventLog: [],
   jobOffers: [],
   employment: null,
+  housing: null,
 
   startGame: (character) => {
+    const startingHousingId = BACKGROUND_STARTING_HOUSING[character.background.id]
+    const housingDef = HOUSING_MAP[startingHousingId]
+    const housing = makeHousing(housingDef, false, 0)
+
     set({
       character,
       gameTime: { ...GAME_START },
@@ -56,10 +59,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activityQueue: [],
       jobOffers: [],
       employment: null,
+      housing,
       eventLog: [
         {
           id: crypto.randomUUID(),
-          message: `Welcome, ${character.firstName}. You have $${character.money.toLocaleString()} and no job. Schedule your first activity to begin.`,
+          message: `Welcome, ${character.firstName}. You're living in a ${housingDef.name} and have $${character.money.toLocaleString()}. Find work to get started.`,
           kind: 'info',
           gameTime: { ...GAME_START }
         }
@@ -69,12 +73,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   tick: () => {
     const state = get()
-    const { character, gameTime, activityQueue, employment } = state
+    const { character, gameTime, activityQueue, employment, housing } = state
     if (!character) return
 
     let activeActivity = state.currentActivity
 
-    // Pull from queue if nothing active
     if (!activeActivity && activityQueue.length > 0) {
       const [next, ...rest] = activityQueue
       set({ currentActivity: next, activityQueue: rest })
@@ -85,35 +88,56 @@ export const useGameStore = create<GameStore>((set, get) => ({
       character,
       activeActivity,
       gameTime,
-      employment
+      employment,
+      housing
     )
 
     const newTime = advanceHour(gameTime)
     const newEvents: GameEvent[] = [...events]
+    const timeCtx = {
+      day: newTime.day, month: newTime.month,
+      year: newTime.year, hour: newTime.hour
+    }
+
+    // Monthly rent/mortgage deduction on the 1st at midnight
+    let finalMoney = updatedChar.money
+    if (newTime.day === 1 && newTime.hour === 0 && housing && housing.monthlyPayment > 0) {
+      finalMoney = Math.max(0, finalMoney - housing.monthlyPayment)
+      const paymentLabel = housing.owned ? 'Mortgage' : 'Rent'
+      newEvents.push({
+        id: crypto.randomUUID(),
+        message: `${paymentLabel} paid: $${housing.monthlyPayment.toLocaleString()} — ${housing.def.name}.`,
+        kind: 'info',
+        gameTime: timeCtx
+      })
+      if (updatedChar.money < housing.monthlyPayment) {
+        newEvents.push({
+          id: crypto.randomUUID(),
+          message: `⚠ You couldn't fully cover your ${paymentLabel.toLowerCase()}! Get more income.`,
+          kind: 'danger',
+          gameTime: timeCtx
+        })
+      }
+    }
 
     // Resolve completed job-search
     if (activityDone && activeActivity?.type === 'job-search') {
       const existingIds = state.jobOffers.map((o) => o.job.id)
-      const newOffers = resolveJobSearch(
-        updatedChar,
-        activeActivity.totalHours,
-        existingIds,
-        newTime
-      )
+      const newOffers = resolveJobSearch(updatedChar, activeActivity.totalHours, existingIds, newTime)
       if (newOffers.length > 0) {
         newEvents.push({
           id: crypto.randomUUID(),
           message: `Job search complete — ${newOffers.length} offer${newOffers.length > 1 ? 's' : ''} waiting.`,
           kind: 'success',
-          gameTime: { day: newTime.day, month: newTime.month, year: newTime.year, hour: newTime.hour }
+          gameTime: timeCtx
         })
         set((s) => ({ jobOffers: [...s.jobOffers, ...newOffers] }))
       } else {
         newEvents.push({
           id: crypto.randomUUID(),
-          message: 'Job search complete — no leads this time. Try again or build your skills.',
+          message: 'Job search complete — no leads this time.',
           kind: 'info',
-          gameTime: { day: newTime.day, month: newTime.month, year: newTime.year, hour: newTime.hour }
+          gameTime: timeCtx
         })
       }
     }
@@ -123,7 +147,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (o) => newTime.totalHours - o.offeredAtHour < OFFER_EXPIRY_HOURS
     )
 
-    // Advance activity queue
+    // Advance activity
     let nextActivity: ScheduledActivity | null = activeActivity
     let nextQueue = get().activityQueue
 
@@ -141,7 +165,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const shouldPause = !nextActivity && nextQueue.length === 0
 
-    // Update employment hours if working
     let updatedEmployment = employment
     if (activeActivity?.type === 'work-shift' && employment) {
       updatedEmployment = {
@@ -152,7 +175,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     set((s) => ({
-      character: updatedChar,
+      character: { ...updatedChar, money: finalMoney },
       gameTime: newTime,
       currentActivity: nextActivity,
       activityQueue: nextQueue,
@@ -175,29 +198,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const activity = makeActivity(type, hours)
     set((s) => ({
       activityQueue: [...s.activityQueue, activity],
-      clock:
-        !s.currentActivity && s.activityQueue.length === 0
-          ? { ...s.clock, paused: false }
-          : s.clock
+      clock: !s.currentActivity && s.activityQueue.length === 0
+        ? { ...s.clock, paused: false }
+        : s.clock
     }))
   },
 
   enqueueWorkShift: (hours) => {
     const { employment } = get()
     if (!employment) return
-    const income = employment.job.hourlyWage
     const activity: ScheduledActivity = {
       type: 'work-shift',
       hoursRemaining: hours,
       totalHours: hours,
-      incomeOverride: income
+      incomeOverride: employment.job.hourlyWage
     }
     set((s) => ({
       activityQueue: [...s.activityQueue, activity],
-      clock:
-        !s.currentActivity && s.activityQueue.length === 0
-          ? { ...s.clock, paused: false }
-          : s.clock
+      clock: !s.currentActivity && s.activityQueue.length === 0
+        ? { ...s.clock, paused: false }
+        : s.clock
     }))
   },
 
@@ -205,7 +225,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { jobOffers, gameTime } = get()
     const offer = jobOffers.find((o) => o.id === offerId)
     if (!offer) return
-
     const employment: Employment = {
       job: offer.job,
       hiredAtHour: gameTime.totalHours,
@@ -213,40 +232,54 @@ export const useGameStore = create<GameStore>((set, get) => ({
       totalHoursWorked: 0,
       totalEarned: 0
     }
-
     set((s) => ({
       employment,
       jobOffers: s.jobOffers.filter((o) => o.id !== offerId),
-      eventLog: [
-        {
-          id: crypto.randomUUID(),
-          message: `You accepted the ${offer.job.title} position at ${offer.job.employer}. Wage: $${offer.job.hourlyWage}/hr.`,
-          kind: 'success',
-          gameTime: { day: gameTime.day, month: gameTime.month, year: gameTime.year, hour: gameTime.hour }
-        },
-        ...s.eventLog
-      ]
+      eventLog: [{
+        id: crypto.randomUUID(),
+        message: `You accepted the ${offer.job.title} position at ${offer.job.employer}. Wage: $${offer.job.hourlyWage}/hr.`,
+        kind: 'success',
+        gameTime: { day: gameTime.day, month: gameTime.month, year: gameTime.year, hour: gameTime.hour }
+      }, ...s.eventLog]
     }))
   },
 
-  declineOffer: (offerId) => {
-    set((s) => ({ jobOffers: s.jobOffers.filter((o) => o.id !== offerId) }))
-  },
+  declineOffer: (offerId) =>
+    set((s) => ({ jobOffers: s.jobOffers.filter((o) => o.id !== offerId) })),
 
   quitJob: () => {
     const { employment, gameTime } = get()
     if (!employment) return
     set((s) => ({
       employment: null,
-      eventLog: [
-        {
-          id: crypto.randomUUID(),
-          message: `You quit your job at ${employment.job.employer}.`,
-          kind: 'warning',
-          gameTime: { day: gameTime.day, month: gameTime.month, year: gameTime.year, hour: gameTime.hour }
-        },
-        ...s.eventLog
-      ]
+      eventLog: [{
+        id: crypto.randomUUID(),
+        message: `You quit your job at ${employment.job.employer}.`,
+        kind: 'warning',
+        gameTime: { day: gameTime.day, month: gameTime.month, year: gameTime.year, hour: gameTime.hour }
+      }, ...s.eventLog]
+    }))
+  },
+
+  moveIn: (def, owned) => {
+    const { character, gameTime } = get()
+    if (!character) return
+
+    const cost = owned ? def.downPayment : def.moveInCost
+    if (character.money < cost) return  // shouldn't be callable, but guard anyway
+
+    const newHousing = makeHousing(def, owned, gameTime.totalHours)
+    const monthlyLabel = owned ? 'mortgage' : 'rent'
+
+    set((s) => ({
+      housing: newHousing,
+      character: { ...character, money: character.money - cost },
+      eventLog: [{
+        id: crypto.randomUUID(),
+        message: `Moved into ${def.name}. ${owned ? `Down payment` : `Move-in cost`}: $${cost.toLocaleString()}. Monthly ${monthlyLabel}: $${newHousing.monthlyPayment.toLocaleString()}.`,
+        kind: 'success',
+        gameTime: { day: gameTime.day, month: gameTime.month, year: gameTime.year, hour: gameTime.hour }
+      }, ...s.eventLog]
     }))
   }
 }))

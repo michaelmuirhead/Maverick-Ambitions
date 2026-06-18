@@ -109,3 +109,73 @@
   height: 1px;
   background: var(--color-border);
 }
+
+/* ── Housing card ── */
+.housingCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.housingCard:hover {
+  border-color: var(--color-accent);
+}
+
+.housingTop {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.housingIcon {
+  font-size: 13px;
+}
+
+.housingName {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.housingTierBadge {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: var(--color-accent-glow);
+  border: 1px solid var(--color-accent);
+  padding: 1px 4px;
+  letter-spacing: 1px;
+}
+
+.housingMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.housingStatus {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.housingRent {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-danger);
+}
+
+.housingCta {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}

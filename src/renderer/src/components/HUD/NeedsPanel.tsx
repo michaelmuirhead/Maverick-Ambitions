@@ -24,8 +24,9 @@ function needColor(val: number): string {
   return 'var(--color-danger)'
 }
 
-export default function NeedsPanel(): JSX.Element {
+export default function NeedsPanel({ onOpenHousing }: { onOpenHousing: () => void }): JSX.Element {
   const character = useGameStore((s) => s.character)
+  const housing   = useGameStore((s) => s.housing)
   if (!character) return <></>
 
   return (
@@ -70,6 +71,30 @@ export default function NeedsPanel(): JSX.Element {
             </div>
           )
         })}
+      </section>
+
+      <div className={styles.divider} />
+
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Housing</h3>
+        <button className={styles.housingCard} onClick={onOpenHousing}>
+          <div className={styles.housingTop}>
+            <span className={styles.housingIcon}>🏠</span>
+            <span className={styles.housingName}>{housing ? housing.def.name : '—'}</span>
+            {housing && (
+              <span className={styles.housingTierBadge}>T{housing.def.tier}</span>
+            )}
+          </div>
+          {housing && (
+            <div className={styles.housingMeta}>
+              <span className={styles.housingStatus}>{housing.owned ? 'Owned' : 'Renting'}</span>
+              {housing.monthlyPayment > 0 && (
+                <span className={styles.housingRent}>${housing.monthlyPayment.toLocaleString()}/mo</span>
+              )}
+            </div>
+          )}
+          <span className={styles.housingCta}>Browse listings →</span>
+        </button>
       </section>
     </aside>
   )

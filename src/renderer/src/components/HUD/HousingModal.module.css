@@ -1,0 +1,265 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  width: 640px;
+  max-height: 80vh;
+  background: var(--color-bg-dark);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.currentLabel {
+  flex: 1;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.currentLabel strong {
+  color: var(--color-text-secondary);
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.closeBtn:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+/* ── View toggle ── */
+.viewToggle {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.viewBtn {
+  flex: 1;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.viewBtn:hover {
+  color: var(--color-text-primary);
+}
+
+.viewBtnActive {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ── Listings ── */
+.listings {
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* ── Card ── */
+.card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.card:not(.cardLocked):not(.cardCurrent):hover {
+  border-color: var(--color-border-light);
+}
+
+.cardCurrent {
+  border-color: var(--color-accent);
+  background: var(--color-accent-glow);
+}
+
+.cardLocked {
+  opacity: 0.55;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.cardTierBadge {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  padding: 2px 5px;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+  margin-top: 1px;
+}
+
+.cardTitleBlock {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.cardName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.cardBed {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  padding: 1px 5px;
+}
+
+.cardPricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.cardMonthly {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.cardCost {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+.cardCostLocked {
+  color: var(--color-danger);
+}
+
+.cardDesc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── Stat pills ── */
+.cardStats {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.statPill {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.statPillNeg {
+  border-color: var(--color-danger);
+}
+
+.statPillLabel {
+  color: var(--color-text-muted);
+}
+
+.statPillValue {
+  color: var(--color-text-secondary);
+  font-weight: 700;
+}
+
+/* ── Footer ── */
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.moveInBtn {
+  height: 30px;
+  padding: 0 var(--spacing-md);
+  background: var(--color-accent);
+  border: none;
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.moveInBtn:hover {
+  opacity: 0.85;
+}
+
+.currentBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.lockedLabel {
+  font-size: 10px;
+  color: var(--color-danger);
+}

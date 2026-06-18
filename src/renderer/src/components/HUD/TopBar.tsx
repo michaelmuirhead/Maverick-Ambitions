@@ -9,7 +9,7 @@ const SPEEDS: { value: ClockSpeed; label: string }[] = [
   { value: 4, label: '4×' }
 ]
 
-export default function TopBar(): JSX.Element {
+export default function TopBar({ onOpenHousing }: { onOpenHousing: () => void }): JSX.Element {
   const character = useGameStore((s) => s.character)
   const gameTime = useGameStore((s) => s.gameTime)
   const clock = useGameStore((s) => s.clock)
@@ -37,6 +37,14 @@ export default function TopBar(): JSX.Element {
       </div>
 
       <div className={styles.controls}>
+        <button
+          className={styles.housingBtn}
+          onClick={onOpenHousing}
+          title="Housing"
+        >
+          🏠
+        </button>
+
         <button
           className={`${styles.pauseBtn} ${clock.paused ? styles.pauseBtnPaused : ''}`}
           onClick={togglePause}
