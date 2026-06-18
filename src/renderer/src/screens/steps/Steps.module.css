@@ -1,0 +1,435 @@
+/* ── Common step layout ── */
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.stepIntro {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.stepIntro strong {
+  color: var(--color-accent);
+}
+
+/* ── Inputs ── */
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.labelHint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-accent);
+  font-size: 12px;
+}
+
+.input {
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 15px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ── Gender selector ── */
+.genderRow {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.genderBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.genderBtn:hover {
+  border-color: var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+.genderBtnActive {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-glow);
+}
+
+.genderIcon {
+  font-size: 18px;
+}
+
+/* ── Slider ── */
+.sliderWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.sliderValue {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* ── Background cards ── */
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+.bgCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.bgCard:hover {
+  border-color: var(--color-border-light);
+  border-left-color: var(--color-border-light);
+  background: var(--color-bg-elevated);
+}
+
+.bgCardSelected {
+  border-color: rgba(240, 180, 41, 0.4);
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-glow);
+}
+
+.bgCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.bgCardName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.bgCardMoney {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-success);
+}
+
+.bgCardDesc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.bgCardFlavour {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.bgCardStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: var(--spacing-xs);
+}
+
+.statPill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: var(--color-bg-card);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.statPillPos { color: var(--color-success); border-color: rgba(72, 187, 120, 0.3); }
+.statPillNeg { color: var(--color-danger);  border-color: rgba(252, 129, 129, 0.3); }
+
+/* ── Trait cards ── */
+.traitCount {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.traitGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+.traitCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.traitCard:hover:not(:disabled) {
+  border-color: var(--color-border-light);
+  border-left-color: var(--color-border-light);
+}
+
+.traitCardSelected {
+  border-color: rgba(240, 180, 41, 0.4);
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-glow);
+}
+
+.traitCardDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.traitCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.traitName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.traitCheck {
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.traitDesc {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.traitEffect {
+  font-size: 10px;
+  color: var(--color-info);
+  font-style: italic;
+}
+
+/* ── Summary ── */
+.summaryCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.summaryIdentity {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.summaryAvatar {
+  width: 56px;
+  height: 56px;
+  background: var(--color-accent-glow);
+  border: 2px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.summaryName {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.summaryMeta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.summaryMoney {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.summaryDivider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.summarySection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summarySectionTitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.summarySectionValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.summarySectionSub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Stat bars */
+.statsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: 110px 1fr 36px;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.statBarTrack {
+  height: 6px;
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%;
+  transition: width var(--transition-slow);
+}
+
+.statValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: right;
+}
+
+/* Begin button */
+.beginBtn {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-accent);
+  border: none;
+  color: var(--color-bg-deep);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.beginBtn:hover {
+  background: #f7c948;
+  transform: translateY(-1px);
+}
+
+.beginBtn:active {
+  transform: translateY(0);
+}

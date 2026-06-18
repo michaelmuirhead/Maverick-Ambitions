@@ -1,0 +1,69 @@
+/* Reset & base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Color palette */
+  --color-bg-deep:       #070b14;
+  --color-bg-dark:       #0d1525;
+  --color-bg-mid:        #141e35;
+  --color-bg-card:       #1a2540;
+  --color-bg-elevated:   #1f2d4a;
+
+  --color-border:        #2a3a5c;
+  --color-border-light:  #3a4e72;
+
+  --color-text-primary:  #e8ecf4;
+  --color-text-secondary:#a0aec0;
+  --color-text-muted:    #627091;
+
+  --color-accent:        #f0b429;   /* amber gold */
+  --color-accent-dim:    #c8921a;
+  --color-accent-glow:   rgba(240, 180, 41, 0.15);
+
+  --color-success:       #48bb78;
+  --color-danger:        #fc8181;
+  --color-info:          #63b3ed;
+
+  /* Typography */
+  --font-display: 'Segoe UI', 'SF Pro Display', system-ui, sans-serif;
+  --font-body:    'Segoe UI', 'SF Pro Text', system-ui, sans-serif;
+  --font-mono:    'Cascadia Code', 'Fira Code', monospace;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Transitions */
+  --transition-fast: 120ms ease;
+  --transition-med:  220ms ease;
+  --transition-slow: 380ms ease;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-deep);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }

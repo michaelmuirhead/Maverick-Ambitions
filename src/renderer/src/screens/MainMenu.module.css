@@ -1,0 +1,170 @@
+.root {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* SVG cityscape fills the bottom */
+.cityscape {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+/* Dark gradient overlay so text is readable */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(7, 11, 20, 0.85) 0%,
+    rgba(7, 11, 20, 0.5) 40%,
+    rgba(7, 11, 20, 0.7) 70%,
+    rgba(7, 11, 20, 0.95) 100%
+  );
+  pointer-events: none;
+}
+
+/* Main content sits above the backdrop */
+.content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2xl);
+  padding: var(--spacing-xl);
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.tagline {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: var(--color-accent);
+  opacity: 0.8;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  gap: 2px;
+}
+
+.titleMaverick {
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  color: var(--color-text-primary);
+  text-shadow:
+    0 0 40px rgba(240, 180, 41, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.titleAmbitions {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 14px;
+  color: var(--color-accent);
+  text-shadow: 0 0 30px rgba(240, 180, 41, 0.4);
+}
+
+.subtitle {
+  margin-top: var(--spacing-sm);
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--color-text-muted);
+}
+
+/* ── Menu ── */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 320px;
+}
+
+.menuBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(20, 30, 53, 0.6);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  backdrop-filter: blur(8px);
+}
+
+.menuBtn:hover:not(:disabled) {
+  background: rgba(31, 45, 74, 0.8);
+  border-left-color: var(--color-accent);
+  transform: translateX(4px);
+}
+
+.menuBtnPrimary {
+  border-color: rgba(240, 180, 41, 0.3);
+  border-left-color: var(--color-accent);
+  background: rgba(240, 180, 41, 0.06);
+}
+
+.menuBtnPrimary:hover:not(:disabled) {
+  background: rgba(240, 180, 41, 0.12);
+  border-left-color: var(--color-accent);
+}
+
+.menuBtnDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.menuBtnLabel {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.menuBtnDesc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* ── Footer ── */
+.footer {
+  position: absolute;
+  bottom: var(--spacing-md);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--spacing-lg);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  z-index: 1;
+  pointer-events: none;
+}
